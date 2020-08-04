@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>智能仓库物流管理系统</title>
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet"/>
+    <script type="text/javascript" src="https://cdn.goeasy.io/goeasy.js"></script>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">智能仓库物流管理系统</div>
+
+        <ul class="layui-nav layui-layout-right">
+
+            <li class="layui-nav-item">
+
+                <a href="javascript:;">
+                    <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+                    <span th:text="${session.userLogin.employeeName}"></span>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="#" id="upPwd">修改密码</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="#" id="message">库存</a></li>
+            <li class="layui-nav-item"><a href="/logout">退出</a></li>
+
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item">
+                    <a class="" href="javascript:;">安全信息管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a th:href="@{/user/toUser}" target="my-content">用户管理</a></dd>
+                        <dd><a th:href="@{/role/toRole}" target="my-content">角色管理</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">仓库管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a th:href="@{/plan/toPlan}" target="my-content">出入库申请</a></dd>
+                        <dd><a th:href="@{/depot/toCome}" target="my-content">入库管理</a></dd>
+                        <dd><a th:href="@{/depot/toOut}" target="my-content">出库管理</a></dd>
+                        <dd><a th:href="@{/goods/toGoods}" target="my-content">仓库存储</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">历史统计</a>
+                    <dl class="layui-nav-child">
+                        <dd><a th:href="@{/depot/toOutEcharts}" target="my-content">出库统计</a></dd>
+                        <dd><a th:href="@{/depot/toComeEcharts}" target="my-content">入库统计</a></dd>
+                        <dd><a th:href="@{/depot/toLog}" target="my-content">历史查询</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <iframe name="my-content" width="100%" height="100%"></iframe>
+    </div>
+    <div class="layui-footer">
+        智能仓储物流管理系统
+    </div>
+</div>
+
+<!--修改密码-->
+<div style="padding: 15px; display: none;" id="dom-win-user-upPwd">
+    <form class="layui-form" lay-filter="form-user-updatePwd">
+        <div class="layui-form-item">
+            <label class="layui-form-label">原密码</label>
+            <div class="layui-input-block">
+                <input type="hidden" name="userId" id="userId" th:value="${session.userLogin.userId}">
+                <input type="hidden" name="userName" id="userName" th:value="${session.userLogin.userName}">
+                <input type="password" name="userPwd" id="userPwd" onblur="check()" required lay-verify="required"
+                       autocomplete="off" class="layui-input"><span style="display:none" id="status"></span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">新密码</label>
+            <div class="layui-input-block">
+                <input type="password" name="userNewPwd1" id="userNewPwd1" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">新密码</label>
+            <div class="layui-input-block">
+                <input type="password" name="userNewPwd2" id="userNewPwd2" required lay-verify="required"
+                       autocomplete="off" class="layui-input"><span style="display:none" id="status2"></span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="bn-user-do-add" id="bn-user-do-add">提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<script th:src="@{/layui/layui.js}"></script>
+<script type="text/javascript" src="/js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="/js/roleJs.js"></script>
+<script type="text/javascript" src="/js/MyMessage.js"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/js/sweetalert-2.1.0.min.js"></script>
+<script th:inline="javascript">
+    var message = [[${session.userRoles}]];
+    opc.getRole(message);
+    opt.alertMessage();
+    $("#message").click(function () {
+        $.ajax({
+            url: '/user/getMessage/',
+            method: 'post',
+            dataType: 'json',
+            success: function (data) {
+            }
+        });
+    });
+
+    //JavaScript代码区域
+    var layerIdx;
+    layui.use(['element', 'form', 'layer'], function () {
+        var element = layui.element;
+        var layer = layui.layer;
+        var form = layui.form;
+
+        $('#upPwd').click(function () {
+            form.val("form-user-updatePwd", {//form-cus-add是表单的lay-filter值
+                "userPwd": "",
+                "userNewPwd1": "",
+                "userNewPwd2": ""
+            });
+            layerIdx = layer.open({
+                type: 1,
+                title: '修改密码',
+                area: ['700px', '400px'],
+                content: $('#dom-win-user-upPwd')
+            });
+        });//打开新增窗口结束
+
+
+    });
+
+    function check() {
+        var oldPwd = $('#userPwd').val();
+        var userId = $('#userId').val();
+        var userName = $('#userName').val();
+        $.ajax({
+            url: '/user/selectOld/' + userId + "/" + oldPwd + "/" + userName,
+            method: 'post',
+            dataType: 'json'
+        }).done(function (result) {
+            console.log(result);
+            if (result.success) {
+                /*  $('#status').text("原密码正确");
+                  $('#status').attr("style","display:");*/
+
+            } else {
+                $('#status').text("原密码错误");
+                $('#status').attr("style", "display:");
+                $('#userPwd').val("");
+            }
+        });
+    }
+
+    $("#bn-user-do-add").click(function () {
+        var userId = $('#userId').val();
+        var Pwd1 = $('#userNewPwd1').val();
+        var Pwd2 = $('#userNewPwd2').val();
+        var userName = $('#userName').val();
+        if (Pwd1 != Pwd2) {
+            $('#status2').text("两次输入的密码不同！");
+            $('#status2').attr("style", "display:");
+            $('#userNewPwd1').val("");
+            $('#userNewPwd2').val("");
+        } else {
+
+            opr.ajax({
+                url: '/user/updatePwd/' + userId + '/' + Pwd1 + "/" + userName,
+                method: 'post',
+                layer: layer,
+                responseOkHandler: function (result) {
+                    location.href = "/user/exit2";
+                }
+            });
+
+
+            return false;
+        }
+    });
+
+</script>
+</body>
+</html>

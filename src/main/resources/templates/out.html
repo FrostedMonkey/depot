@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <script type="text/javascript" src="https://cdn.goeasy.io/goeasy.js"></script>
+</head>
+<body>
+<div style="padding: 0px 0 15px 0px;">
+		<span class="layui-breadcrumb" lay-separator="-"> <a href="#">仓库存储</a>
+			<a><cite>出库管理</cite></a>
+		</span>
+</div>
+
+<form class="layui-form" id="form-trade-query">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <select name="tradeStatus" lay-verify="required" lay-filter="select-trade-query-trade-status">
+                    <option value="">全部</option>
+                    <option value="1">为准备</option>
+                    <option value="20">已准备</option>
+                    <option value="25">已确认</option>
+                    <option value="30">已出库</option>
+                </select>
+            </div>
+
+
+            <label class="layui-form-label">编号</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="number" name="tradeId" autocomplete="off"
+                       class="layui-input">
+            </div>
+
+
+            <button class="layui-btn" id="bn-trade-query"><i class="layui-icon layui-icon-search"></i> 查询</button>
+        </div>
+    </div>
+</form>
+<table id="info-trade-table" lay-filter="tradeTable"></table>
+<div style="padding: 15px; display: none;" id="dom-win-trade-add">
+
+    <form class="layui-form" lay-filter="form-trade-add">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">快递名称</label>
+            <div class="layui-input-block" id="kuaidi">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">快递详情</label>
+            <div class="layui-input-block" id="message">
+            </div>
+        </div>
+
+
+    </form>
+
+</div>
+
+
+<div style="padding: 15px; display: none;" id="dom-win-trade-upd">
+
+    <form class="layui-form" lay-filter="form-trade-kuaidi">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">出库id</label>
+            <div class="layui-input-block">
+                <input type="text" name="tradeId" id="idsss" required lay-verify="required" readonly="readonly"
+                       autocomplete="off" class="layui-input"
+                       onclick="layer.tips('编号不可编辑。', this,{tips:[4,'#6f6f6f'],time: 1500});">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">货物id</label>
+            <div class="layui-input-block">
+                <input type="text" name="goodsId" id="idsss2" required lay-verify="required" readonly="readonly"
+                       autocomplete="off" class="layui-input"
+                       onclick="layer.tips('编号不可编辑。', this,{tips:[4,'#6f6f6f'],time: 1500});">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">快递单号</label>
+            <div class="layui-input-block">
+                <input type="text" name="kuaiDi" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="bn-kuaidi-do-add">提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+<!--操作栏-->
+<script type="text/html" id="barDemo">
+    {{#  if(d.tradeStatus == 1 && d.tradeType==1){ }}
+    <a class="layui-btn  layui-btn-xs" lay-event="trade_enter4">
+        准备</a>
+    {{#  }else if(d.tradeStatus == 20 && d.tradeType==1){  }}
+    <a class="layui-btn  layui-btn-xs" lay-event="trade_enter5">
+        确认</a>
+    {{#  }else if(d.tradeStatus == 25 && d.tradeType==1){  }}
+    <a class="layui-btn  layui-btn-xs" lay-event="trade_enter6">
+        出库</a>
+    {{#  }else if(d.tradeStatus == 30 && d.tradeType==1){  }}
+    <a class="layui-btn  layui-btn-xs" lay-event="trade_enter7">
+        快递详情</a>
+    {{#  }  }}
+</script>
+<script src="/layui/layui.js"></script>
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="/js/sweetalert-2.1.0.min.js"></script>
+<script src="/js/common.js"></script>
+<script type="text/javascript" src="/js/roleJs.js"></script>
+<script type="text/javascript" src="/js/MyMessage.js"></script>
+<script th:inline="none">
+    layui.use(['element', 'table', 'layer', 'form'], function () {
+        var table = layui.table;
+        var layer = layui.layer;
+        var form = layui.form;
+
+
+        var tradeTable = table.render({
+            elem: '#info-trade-table',
+            url: '/trade/outList', //数据接口
+            page: true,//显示分页条
+            limits: [5, 10, 15, 20, 30],
+            limit: 5,
+            cols:
+                [[ //表头
+                    {
+                        field: 'tradeId',
+                        title: '单号',
+                        align: 'center',
+                    }, {
+                        field: 'goodsName',
+                        title: '商品名称',
+                        align: 'center',
+                    }, {
+                        field: 'number',
+                        title: '出/入库数量',
+                        align: 'center',
+                    }, {
+                        field: 'tradeType',
+                        title: '类型',
+                        align: 'center',
+                        width: 80,
+                        templet: function (d) {
+                            if (d.tradeType == 0) {
+                                return "入库";
+                            }
+                            if (d.tradeType == 1) {
+                                return "出库";
+                            }
+                        }
+                    }
+                    , {
+                        field: 'tradeStatus',
+                        title: '状态',
+                        align: 'center',
+                        templet: function (d) {
+                            if (d.tradeStatus == 1) {
+                                return "未准备";
+                            }
+                            if (d.tradeStatus == 20) {
+                                return "已准备";
+                            }
+                            if (d.tradeStatus == 25) {
+                                return "出库已确认";
+                            }
+                            if (d.tradeStatus == 30) {
+                                return "已出库";
+                            }
+                        }
+                    }, {
+                        align: 'center',
+                        title: '操作',
+                        toolbar: '#barDemo'
+                    }
+
+                ]]
+        });
+
+        table.on('tool(tradeTable)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            var tr = obj.tr; //获得当前行 tr 的DOM对象
+            if (layEvent === 'trade_enter4') {
+                opr.ajaxWithConfirm({
+                    title: "已准备?",
+                    url: '/trade/update/' + 20,
+                    data: JSON.stringify(data),
+                    method: 'post',
+                    layer: layer,
+                    layuiTableIns: tradeTable
+                });
+            } else if (layEvent === 'trade_enter5') {
+                opr.ajaxWithConfirm({
+                    title: "确定此操作吗?",
+                    url: '/trade/update/' + 25,
+                    data: JSON.stringify(data),
+                    method: 'post',
+                    layer: layer,
+                    layuiTableIns: tradeTable
+                });
+            } else if (layEvent === 'trade_enter6') {
+                $('#idsss').val(data.tradeId);
+                $('#idsss2').val(data.goodsId);
+                layerIdx = layer.open({
+                    type: 1,
+                    title: '修改信息',
+                    area: ['700px', '400px'],
+                    content: $('#dom-win-trade-upd'),
+                    zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+                });
+            } else if (layEvent === 'trade_enter7') {
+                opr.ajax({
+                    url: '/trade/express/' + data.kuaiDi,
+                    method: 'get',
+                    layer: layer,
+                    responseOkHandler: function (role) {
+                        var tr = JSON.parse(role.data);
+                        $("<span>" + tr.result.expName + "</option>").appendTo("#kuaidi");
+                        var l = tr.result.list;
+                        for (var i = 0; i < l.length; i++) {
+                            var item = l[i];
+                            $("<span>时间：" + item.time + ",状态：" + item.status + "</option><br/>").appendTo("#message");
+                        }
+                        layerIdx = layer.open({
+                            type: 1,
+                            title: '快递详情',
+                            area: ['700px', '400px'],
+                            content: $('#dom-win-trade-add'),
+                            zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+                        });
+
+                    }
+                });
+            }
+        });//监听工具条结束
+        //监听select选择
+        form.on('select(select-trade-query-trade-status)', function (data) {
+            $('#bn-trade-query').click();
+
+        });
+        form.on('submit(bn-kuaidi-do-add)', function (data) {
+            opr.ajax({
+                url: '/trade/kuadi',
+                data: JSON.stringify(data.field),
+                method: 'post',
+                layer: layer,
+                layuiTableIns: tradeTable,
+                responseOkHandler: function (result) {
+                    layer.close(layerIdx);
+                    return true;//返回true,继续默认后续行为
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        $('#bn-trade-query').click(function () {
+
+            //将表单参数封装为json对象
+            var arr = $("#form-trade-query").serializeArray();
+            var params = {};
+
+            for (var i = 0; i < arr.length; i++) {
+                params[arr[i].name] = arr[i].value;
+            }
+
+            //传递查询参数重载表格（内部为ajax请求）
+            tradeTable.reload({
+                where: params,
+                page: {
+                    curr: 1
+                    //重新从第 1 页开始
+                }
+            });
+            return false;
+        });//查询结束
+        var layerIdx;
+        $('#bn-trade-add').click(function () {
+            opr.ajax({
+                url: '/trade/express',
+                method: 'get',
+                layer: layer,
+                responseOkHandler: function (role) {
+                    var tr = JSON.parse(role.data);
+                    $("<span>" + tr.result.expName + "</option>").appendTo("#kuaidi");
+                    var l = tr.result.list;
+                    for (var i = 0; i < l.length; i++) {
+                        var item = l[i];
+                        $("<span>时间：" + item.time + ",状态：" + item.status + "</option><br/>").appendTo("#message");
+                    }
+                    layerIdx = layer.open({
+                        type: 1,
+                        title: '修改角色信息',
+                        area: ['800px', '540px'],
+                        content: $('#dom-win-trade-add'),
+                        zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+                    });
+
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

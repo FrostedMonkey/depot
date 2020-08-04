@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <script type="text/javascript" src="https://cdn.goeasy.io/goeasy.js"></script>
+</head>
+<body>
+<div style="padding: 0px 0 15px 0px;">
+		<span class="layui-breadcrumb" lay-separator="-"> <a href="#">安全信息管理</a>
+			<a><cite>角色信息维护</cite></a>
+		</span>
+</div>
+<!-- 修改窗口内容 -->
+<div style="padding: 15px; display: none;" id="dom-win-role-upd">
+
+    <form class="layui-form" lay-filter="form-role-upd">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色编号</label>
+            <div class="layui-input-block">
+                <input type="text" id="input-sta-upd-role-id" name="roleId" required lay-verify="required"
+                       readonly="readonly"
+                       autocomplete="off" class="layui-input"
+                       onclick="layer.tips('编号不可编辑。', this,{tips:[4,'#6f6f6f'],time: 1500});">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="roleName" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色说明</label>
+            <div class="layui-input-block">
+                <input type="text" name="roleRemark" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="bn-role-do-upd">提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<!-- 查询表单 -->
+<form class="layui-form" id="form-role-query">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <select name="roleStatus" lay-verify="required" lay-filter="select-role-query-role-status">
+                    <option value="">全部</option>
+                    <option value="0">未确定</option>
+                    <option value="1">已确定</option>
+                    <option value="2">启用</option>
+                    <option value="3">禁用</option>
+                </select>
+            </div>
+
+
+            <label class="layui-form-label">编号</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="number" name="roleId" autocomplete="off"
+                       class="layui-input">
+            </div>
+
+            <label class="layui-form-label">名称</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="text" name="roleName" autocomplete="off"
+                       class="layui-input">
+            </div>
+
+            <label class="layui-form-label">说明</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="text" name="roleRemark" autocomplete="off"
+                       class="layui-input">
+            </div>
+
+            <button class="layui-btn" id="bn-role-query"><i class="layui-icon layui-icon-search"></i> 查询</button>
+
+        </div>
+    </div>
+</form>
+<div class="layui-btn-container">
+    <button type="button" class="layui-btn" id="bn-role-add"><i class="layui-icon">&#xe608;</i> 新增</button>
+    <button type="button" class="layui-btn" id="bn-role-enter"><i class="layui-icon">&#xe608;</i> 确认</button>
+    <button type="button" class="layui-btn" id="bn-role-open"><i class="layui-icon">&#xe608;</i> 启用</button>
+    <button type="button" class="layui-btn" id="bn-role-close"><i class="layui-icon">&#xe608;</i> 禁用</button>
+</div>
+
+<table id="info-role-table" lay-filter="roleTable"></table>
+
+<!-- 新增窗口内容 -->
+<div style="padding: 15px; display: none;" id="dom-win-role-add">
+
+    <form class="layui-form" lay-filter="form-role-add">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="roleName" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色说明</label>
+            <div class="layui-input-block">
+                <input type="text" name="roleRemark" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="bn-role-do-add">提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<!--操作栏-->
+<script type="text/html" id="barDemo">
+    <!--  laytpl 语法， d指数据，在这里指当前行数据 -->
+    {{#  if(d.roleStatus == 0 ){ }}
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="role_enter"><i
+            class="layui-icon layui-icon-ok-circle"></i>
+        确定</a>
+
+    <a class="layui-btn layui-btn-xs" lay-event="role_edit"><i class="layui-icon">&#xe608;</i> 编辑</a>
+    {{#  }else if(d.roleStatus == 1 || d.roleStatus == 2 ){  }}
+    <a class="layui-btn layui-btn-xs" lay-event="role_use"><i class="layui-icon layui-icon-auz"></i> 启用</a>
+    {{#  }else if(d.roleStatus == 3){  }}
+    <a class="layui-btn layui-btn-xs" lay-event="role_unse"><i class="layui-icon layui-icon-auz"></i> 禁用</a>
+    <a class="layui-btn layui-btn-xs" lay-event="role_module"><i class="layui-icon layui-icon-set"></i> 权限</a>
+    {{#  }  }}
+</script>
+<script src="/layui/layui.js"></script>
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="/js/sweetalert-2.1.0.min.js"></script>
+<script src="/js/common.js"></script>
+<script type="text/javascript" src="/js/roleJs.js"></script>
+<script type="text/javascript" src="/js/MyMessage.js"></script>
+<script th:inline="none">
+    var Layermodules;
+    layui.use(['element', 'table', 'layer', 'form'], function () {
+        var table = layui.table;
+        var layer = layui.layer;
+        var form = layui.form;
+
+
+        var roleTable = table.render({
+            elem: '#info-role-table',
+            url: '/role/list', //数据接口
+            page: true,//显示分页条
+            limits: [5, 10, 15, 20, 30],
+            limit: 5,
+            cols:
+                [[ //表头
+                    {
+                        type: 'checkbox'
+                    }, {
+                        field: 'roleId',
+                        title: '角色编号'
+                    }, {
+                        field: 'roleName',
+                        title: '角色名称'
+                    }, {
+                        field: 'roleRemark',
+                        title: '角色说明'
+                    }, {
+                        field: 'roleStatus',
+                        title: '状态',
+                        align: 'center',
+                        templet: function (d) {
+                            if (d.roleStatus == 0) {
+                                return "未确定";
+                            }
+                            if (d.roleStatus == 1 || d.roleStatus == 2) {
+                                return "未启用";
+                            }
+                            if (d.roleStatus == 3) {
+                                return "以启用";
+                            }
+                        }
+                    }, {
+                        align: 'center',
+                        title: '操作',
+                        toolbar: '#barDemo'
+                    }
+
+                ]]
+        });
+
+        table.on('tool(roleTable)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            var tr = obj.tr; //获得当前行 tr 的DOM对象
+            if (layEvent === 'role_edit') { //编辑
+                opr.ajax({
+                    url: '/role/selectById/' + data.roleId,
+                    method: 'post',
+                    layer: layer,
+                    responseOkHandler: function (role) {
+
+                        //form-cus-upd是表单的lay-filter值
+                        form.val("form-role-upd", role);
+
+                        layerIdx = layer.open({
+                            type: 1,
+                            title: '修改角色信息',
+                            area: ['700px', '400px'],
+                            content: $('#dom-win-role-upd'),
+                            zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+                        });
+
+                    }
+                });
+
+            } else if (layEvent === 'role_use') { //启用
+                opr.ajaxWithConfirm({
+                    title: "您确实要启用该角色信息吗?",
+                    url: '/role/update/' + data.roleId + '/3',
+                    method: 'post',
+                    layer: layer,
+                    layuiTableIns: roleTable
+                });
+
+            } else if (layEvent === 'role_module') {
+                $.ajax({
+                    url: '/role/doRole/' + data.roleId,
+                    method: 'get',
+                    dataType: 'html'
+                }).done(function (html) {
+                    Layermodules = layer.open({
+                        type: 1,
+                        area: ['700px', '400px'],
+                        content: html,
+                        zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+                    });
+
+                    form.render(null, 'form-role-module');//手动渲染表单
+
+                });
+            } else if (layEvent === 'role_unse') { //禁用
+
+                opr.ajaxWithConfirm({
+                    title: "您确实要禁用该角色信息吗?",
+                    url: '/role/update/' + data.roleId + '/2',
+                    method: 'post',
+                    layer: layer,
+                    layuiTableIns: roleTable
+                });
+
+
+            } else if (layEvent === 'role_enter') {
+                opr.ajaxWithConfirm({
+                    title: "您确定该角色信息吗?",
+                    url: '/role/update/' + data.roleId + '/1',
+                    method: 'post',
+                    layer: layer,
+                    layuiTableIns: roleTable
+                });
+
+
+            }
+
+        });//监听工具条结束
+
+        //打开新增窗口
+        var layerIdx;
+        $('#bn-role-add').click(function () {
+            form.val("form-role-add", {//form-cus-add是表单的lay-filter值
+                "roleName": "",
+                "roleRemark": ""
+            });
+            layerIdx = layer.open({
+                type: 1,
+                title: '新增角色信息',
+                area: ['700px', '400px'],
+                content: $('#dom-win-role-add'),
+                zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+            });
+        });//打开新增窗口结束
+        //监听新增表单提交。bn-role-do-add是新增表单中提交按钮的lay-filter值
+        form.on('submit(bn-role-do-add)', function (data) {
+            opr.ajax({
+                url: '/role/add',
+                data: JSON.stringify(data.field),
+                method: 'post',
+                layer: layer,
+                layuiTableIns: roleTable,
+                responseOkHandler: function (result) {
+                    layer.close(layerIdx);
+                    return true;//返回true,继续默认后续行为
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        form.on('submit(bn-role-do-upd)', function (data) {
+            opr.ajax({
+                url: '/role/updates',
+                data: JSON.stringify(data.field),
+                method: 'post',
+                contentType: 'application/json;charset=UTF-8',
+                layer: layer,
+                layuiTableIns: roleTable,
+                responseOkHandler: function (result) {
+                    layer.close(layerIdx);
+                    return true;//返回true,继续默认后续行为
+                }
+            });
+
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });//监听修改表单提交结束
+
+        //监听select选择
+        form.on('select(select-role-query-role-status)', function (data) {
+            $('#bn-role-query').click();
+
+        });//监听select选择结束
+//查询
+        $('#bn-role-query').click(function () {
+
+            //将表单参数封装为json对象
+            var arr = $("#form-role-query").serializeArray();
+            var params = {};
+
+            for (var i = 0; i < arr.length; i++) {
+                params[arr[i].name] = arr[i].value;
+            }
+
+            //传递查询参数重载表格（内部为ajax请求）
+            roleTable.reload({
+                where: params,
+                page: {
+                    curr: 1
+                    //重新从第 1 页开始
+                }
+            });
+            return false;
+        });//查询结束
+
+        var changeMultiCusStatus = function (title, text, rStatus) {
+            var checkStatus = table.checkStatus('info-role-table'); //基础参数id对应的值
+            if (checkStatus.data.length == 0) {
+                swal({
+                    text: '您没有选择任何数据！',
+                    icon: "error",
+                    buttons: false,
+                    timer: 1500
+                });
+                return;
+            }
+
+            var arr = [];
+            $.each(checkStatus.data, function () {
+                arr.push(this.roleId);
+            });
+
+            opr.ajaxWithConfirm({
+                title: title,
+                text: text,
+                url: '/role/status/' + rStatus,
+                data: JSON.stringify(arr),
+                contentType: 'application/json;charset=UTF-8',
+                method: 'post',
+                layer: layer,
+                layuiTableIns: roleTable
+            });
+
+
+        }//函数：改变多个客户信息状态结束
+
+        $('#bn-role-enter').click(function () {
+
+            changeMultiCusStatus('您确实要确认选择的角色吗？', '', '1');
+
+        });//启用多条数据
+        $('#bn-role-open').click(function () {
+
+            changeMultiCusStatus('您确实要启用选择的角色吗？', '', '3');
+
+        });//启用多条数据
+        $('#bn-role-close').click(function () {
+
+            changeMultiCusStatus('您确实要禁用选择的角色吗？', '', '2');
+
+        });
+    });
+</script>
+</body>
+</html>

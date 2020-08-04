@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>出库</title>
+    <!-- 引入 echarts.js -->
+    <script src="/js/echarts.min.js"></script>
+    <script src="/js/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="https://cdn.goeasy.io/goeasy.js"></script>
+</head>
+<body>
+<div class="content" style="width:1000px;height:100%;">
+    <div id="main1" class="left" style="float:left;width:50%;height:500px;"></div>
+    <div id="main2" class="right" style="float:right;width:50%;height:500px;"></div>
+</div>
+<script type="text/javascript" src="/js/roleJs.js"></script>
+<script type="text/javascript" src="/js/MyMessage.js"></script>
+<script type="text/javascript">
+    var myChart1 = echarts.init(document.getElementById('main1'));
+    myChart1.setOption({
+        backgroundColor: '#FFFFFF',
+
+        title: {
+            text: '总出库情况',
+            left: 'center',
+            top: 20,
+            textStyle: {
+                color: '#000000'
+            }
+        },
+
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+
+        visualMap: {
+            show: false,
+            min: 200,
+            max: 5000,
+            inRange: {
+                colorLightness: [0, 1]
+            }
+        },
+        series: [
+            {
+                name: '访问来源',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '50%'],
+                data: [].sort(function (a, b) {
+                    return a.value - b.value;
+                }),
+                roseType: 'radius',
+                label: {
+                    normal: {
+                        textStyle: {
+                            color: '#000000'
+                        }
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        lineStyle: {
+                            color: '#000000'
+                        },
+                        smooth: 0.2,
+                        length: 10,
+                        length2: 20
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        color: '#c23531',
+                        shadowBlur: 200,
+                        shadowColor: 'rgba(30, 144, 255，0.5)'
+                    }
+                },
+
+                animationType: 'scale',
+                animationEasing: 'elasticOut',
+                animationDelay: function (idx) {
+                    return Math.random() * 200;
+                }
+            }
+        ]
+    });
+    $.ajax({
+        type: "post",
+        url: "/trade/Yechatrs/1",
+        success: function (r) {
+            myChart1.setOption({
+                series: [{
+                    // 根据名字对应到相应的系列
+                    data: r.data
+                }]
+            });
+        }
+    })
+    var myChart2 = echarts.init(document.getElementById('main2'));
+    var data1 = "";
+    var data2 = "";
+    // 显示标题，图例和空的坐标轴
+    myChart2.setOption({
+        backgroundColor: '#ffffff',
+        tooltip: {},
+        legend: {
+            data: ['具体数据']
+        },
+        xAxis: {
+            data: []
+        },
+        yAxis: {},
+        series: [{
+            name: '具体数据',
+            type: 'bar',
+            data: []
+        }]
+    });
+    myChart1.on('click', function (param) {
+        var goodsPname = param.name;
+        $.ajax({
+            type: "post",
+            url: "/trade/echatrs/1/" + goodsPname,
+            success: function (r) {
+                data1 = r.data.goodsName;
+                data2 = r.data.goodsNumber;
+                myChart2.setOption({
+                    xAxis: {
+                        data: r.data.goodsName
+                    },
+                    series: [{
+                        // 根据名字对应到相应的系列
+                        name: '具体数据',
+                        data: r.data.goodsNumber
+                    }]
+                });
+            }
+        })
+    });
+
+</script>
+</body>
+</html>

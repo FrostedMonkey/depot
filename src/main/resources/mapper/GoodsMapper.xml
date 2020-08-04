@@ -1,0 +1,40 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.twoc.depots.mapper.GoodsMapper">
+    <select id="selectGoods" resultType="com.twoc.depots.bean.vo.GoodsVO">
+        SELECT
+        d.goods_id,
+        d.goods_name,
+        d.goods_pname,
+        d.goods_pid,
+        IFNULL(g.goods_number,0) goods_number
+        FROM
+        depot_dict d
+        LEFT JOIN depot_goods g ON d.goods_id = g.goods_id
+        where d.goods_id is not null
+    </select>
+    <select id="selectNumber" resultType="com.twoc.depots.bean.vo.GoodsVO">
+        select y.goods_name,y.goods_number from
+        (SELECT
+        d.goods_id,
+        d.goods_name,
+        d.goods_pname,
+        d.goods_pid,
+        IFNULL(g.goods_number,0) goods_number
+        FROM
+        depot_dict d
+        LEFT JOIN depot_goods g ON d.goods_id = g.goods_id
+        where d.goods_id is not null) as y where y.goods_number&lt;1000
+    </select>
+    <update id="updateNumber">
+        UPDATE depot_goods set goods_number=goods_number+#{number} where goods_id=#{goodsId}
+    </update>
+
+    <update id="updateNumber2">
+        UPDATE depot_goods set goods_number=goods_number-#{number} where goods_id=#{goodsId}
+    </update>
+    <select id="selectByGoodsId" resultType="com.twoc.depots.entity.Goods">
+        select goods_id from depot_goods where goods_id=#{goodsId}
+    </select>
+</mapper>

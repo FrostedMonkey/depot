@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <script type="text/javascript" src="https://cdn.goeasy.io/goeasy.js"></script>
+</head>
+<body>
+<div style="padding: 0px 0 15px 0px;">
+		<span class="layui-breadcrumb" lay-separator="-"> <a href="#">仓库管理</a>
+			<a><cite>出入库申请</cite></a>
+		</span>
+</div>
+<form class="layui-form" id="form-plan-query">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <select name="tradeStatus" lay-verify="required" lay-filter="select-plan-query-plan-status">
+                    <option value="">全部</option>
+                    <option value="0">未通过</option>
+                    <option value="1">已通过</option>
+                </select>
+            </div>
+
+
+            <label class="layui-form-label">编号</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="number" name="tradeId" autocomplete="off"
+                       class="layui-input">
+            </div>
+
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <select name="tradeType" lay-verify="select-plan-query-plan-type">
+                    <option value="">请选择类型</option>
+                    <option value="0">入库</option>
+                    <option value="1">出库</option>
+                </select>
+            </div>
+
+            <button class="layui-btn" id="bn-plan-query"><i class="layui-icon layui-icon-search"></i> 查询</button>
+
+            <button type="button" class="layui-btn" id="bn-plan-add"><i class="layui-icon">&#xe608;</i> 新增</button>
+
+        </div>
+    </div>
+</form>
+<table id="info-plan-table" lay-filter="planTable"></table>
+<!-- 新增窗口内容 -->
+<div style="padding: 15px; display: none;" id="dom-win-plan-add">
+
+    <form class="layui-form" lay-filter="form-plan-add">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品名称</label>
+            <div class="layui-inline">
+                <select name="goodsPid" id="pName" lay-filter="Pselect" lay-verify="required">
+                </select>
+                <select name="goodsId" id="Name" lay-filter="Sselect">
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品数量</label>
+            <div class="layui-input-block">
+                <input type="number" name="number" id="number" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+                <input type="hidden" id="number2" name="Havenumber">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-block">
+                <select name="tradeType" lay-verify="">
+                    <option value="">请选择类型</option>
+                    <option value="0">入库</option>
+                    <option value="1">出库</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="bn-plan-do-add">提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<!-- 修改窗口内容 -->
+<div style="padding: 15px; display: none;" id="dom-win-plan-upd">
+
+    <form class="layui-form" lay-filter="form-plan-upd">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">单号</label>
+            <div class="layui-input-block">
+                <input type="text" id="input-sta-upd-plan-id" name="tradeId" required lay-verify="required"
+                       readonly="readonly"
+                       autocomplete="off" class="layui-input"
+                       onclick="layer.tips('编号不可编辑。', this,{tips:[4,'#6f6f6f'],time: 1500});">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="goodsName" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">商品数量</label>
+            <div class="layui-input-block">
+                <input type="number" name="number" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-block">
+                <select name="tradeType" lay-verify="">
+                    <option value="">请选择性别</option>
+                    <option value="0">入库</option>
+                    <option value="1">出库</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="bn-plan-do-upd">提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<!--操作栏-->
+<script type="text/html" id="barDemo">
+    {{#  if(d.tradeStatus == 0){ }}
+    <p shiro:hasRole="仓库主管">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="plan_enter"><i
+                class="layui-icon layui-icon-ok-circle"></i>
+            通过</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="plan_Noenter"><i
+                class="layui-icon layui-icon-ok-circle"></i>
+            驳回</a>
+    </p>
+    <p shiro:hasRole="仓库管理员">
+        <a class="layui-btn layui-btn-xs" lay-event="plan_edit"><i class="layui-icon">&#xe608;</i> 编辑</a>
+    </p>
+    {{#  }else if(d.tradeStatus == 1 ){  }}
+    申请已通过
+    {{#  }else if(d.tradeStatus == 2){  }}
+    申请被驳回
+    {{#  }  }}
+
+
+    <!--  laytpl 语法， d指数据，在这里指当前行数据 -->
+
+    <!-- &ndash;&gt;-->
+
+
+    <!-- -->
+
+</script>
+<script src="/layui/layui.js"></script>
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="/js/sweetalert-2.1.0.min.js"></script>
+<script src="/js/common.js"></script>
+<script type="text/javascript" src="/js/roleJs.js"></script>
+<script type="text/javascript" src="/js/MyMessage.js"></script>
+<script th:inline="none">
+    layui.use(['element', 'table', 'layer', 'form'], function () {
+        var table = layui.table;
+        var layer = layui.layer;
+        var form = layui.form;
+
+
+        var planTable = table.render({
+            elem: '#info-plan-table',
+            url: '/plan/list', //数据接口
+            page: true,//显示分页条
+            limits: [5, 10, 15, 20, 30],
+            limit: 5,
+            cols:
+                [[ //表头
+                    {
+                        field: 'tradeId',
+                        title: '单号',
+                        align: 'center',
+                    }, {
+                        field: 'goodsName',
+                        title: '商品名称',
+                        align: 'center',
+                    }, {
+                        field: 'number',
+                        title: '出/入库数量',
+                        align: 'center',
+                    }, {
+                        field: 'applyPerson',
+                        title: '申请人',
+                        align: 'center',
+                        width: 80
+                    }, {
+                        field: 'applyTime',
+                        title: '申请时间',
+                        width: 200,
+                        align: 'center',
+                    },
+                    {
+                        field: 'tradeType',
+                        title: '类型',
+                        align: 'center',
+                        width: 80,
+                        templet: function (d) {
+                            if (d.tradeType == 0) {
+                                return "入库";
+                            }
+                            if (d.tradeType == 1) {
+                                return "出库";
+                            }
+                        }
+                    }
+                    , {
+                        field: 'tradeStatus',
+                        title: '状态',
+                        align: 'center',
+                        templet: function (d) {
+                            if (d.tradeStatus == 0) {
+                                return "未审批";
+                            }
+                            if (d.tradeStatus == 1) {
+                                return "审批已通过";
+                            }
+                            if (d.tradeStatus == 2) {
+                                return "审批被驳回";
+                            }
+                        }
+                    }, {
+                        align: 'center',
+                        title: '操作',
+                        toolbar: '#barDemo'
+                    }
+
+                ]]
+        });
+
+        table.on('tool(planTable)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            var tr = obj.tr; //获得当前行 tr 的DOM对象
+            if (layEvent === 'plan_edit') { //编辑
+                opr.ajax({
+                    url: '/plan/selectById/' + data.tradeId,
+                    method: 'post',
+                    layer: layer,
+                    responseOkHandler: function (plan) {
+
+                        //form-cus-upd是表单的lay-filter值
+                        form.val("form-plan-upd", plan);
+
+                        layerIdx = layer.open({
+                            type: 1,
+                            title: '修改角色信息',
+                            area: ['700px', '400px'],
+                            content: $('#dom-win-plan-upd'),
+                            zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+                        });
+
+                    }
+                });
+
+            } else if (layEvent === 'plan_enter') {
+                opr.ajaxWithConfirm({
+                    title: "您确定该申请吗?",
+                    url: '/plan/update/' + data.tradeId + '/1',
+                    data: JSON.stringify(data),
+                    method: 'post',
+                    layer: layer,
+                    layuiTableIns: planTable
+                });
+
+
+            } else if (layEvent === 'plan_Noenter') {
+                opr.ajaxWithConfirm({
+                    title: "您确定驳回该申请吗?",
+                    url: '/plan/update/' + data.tradeId + '/2',
+                    data: JSON.stringify(data),
+                    method: 'post',
+                    layer: layer,
+                    layuiTableIns: planTable
+                });
+
+
+            }
+
+        });//监听工具条结束
+        var layerIdx;
+        $('#bn-plan-add').click(function () {
+            form.val("form-plan-add", {//form-cus-add是表单的lay-filter值
+                "number": "",
+                "tradeType": "",
+            });
+            opr.ajax({
+                url: '/dict/getPdict',
+                method: 'post',
+                layer: layer,
+                responseOkHandler: function (plan) {
+                    if (plan.length > 0) {
+                        $('#pName').empty();
+                        $('#pName').append("<option value=''>选择主分类</option>");
+                        for (var i = 0; i < plan.length; i++) {
+                            var item = plan[i];
+                            $("<option value=" + item.goodsPid + ">" + item.goodsPname + "</option>").appendTo("#pName");
+                        }
+                        form.render("select")
+                    }
+
+
+                    layerIdx = layer.open({
+                        type: 1,
+                        title: '新增出入库信息',
+                        area: ['700px', '400px'],
+                        content: $('#dom-win-plan-add'),
+                        zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+                    });
+
+                }
+            });
+        });//打开新增窗口结束
+        form.on('submit(bn-plan-do-add)', function (data) {
+            var dates = data.field;
+            var out = dates.number;
+            var types = dates.tradeType;
+            var have = dates.Havenumber;
+            if (types == 1) {
+                if (have >= out) {
+                    opr.ajax({
+                        url: '/plan/add',
+                        data: JSON.stringify(data.field),
+                        method: 'post',
+                        layer: layer,
+                        layuiTableIns: planTable,
+                        responseOkHandler: function (result) {
+                            layer.close(layerIdx);
+                            return true;//返回true,继续默认后续行为
+                        }
+                    });
+                } else {
+                    swal({
+                        text: "库存量不足",
+                    });
+                }
+            } else {
+                opr.ajax({
+                    url: '/plan/add',
+                    data: JSON.stringify(data.field),
+                    method: 'post',
+                    layer: layer,
+                    layuiTableIns: planTable,
+                    responseOkHandler: function (result) {
+                        layer.close(layerIdx);
+                    }
+                });
+            }
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        form.on('submit(bn-plan-do-upd)', function (data) {
+            opr.ajax({
+                url: '/plan/updates',
+                data: JSON.stringify(data.field),
+                method: 'post',
+                contentType: 'application/json;charset=UTF-8',
+                layer: layer,
+                layuiTableIns: planTable,
+                responseOkHandler: function (result) {
+                    layer.close(layerIdx);
+                    return true;//返回true,继续默认后续行为
+                }
+            });
+
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });//监听修改表单提交结束
+
+        //监听select选择
+        form.on('select(select-plan-query-plan-status)', function (data) {
+            $('#bn-plan-query').click();
+
+        });//监听select选择结束
+        form.on('select(select-plan-query-plan-type)', function (data) {
+            $('#bn-plan-query').click();
+
+        });
+//查询
+        $('#bn-plan-query').click(function () {
+
+            //将表单参数封装为json对象
+            var arr = $("#form-plan-query").serializeArray();
+            var params = {};
+
+            for (var i = 0; i < arr.length; i++) {
+                params[arr[i].name] = arr[i].value;
+            }
+
+            //传递查询参数重载表格（内部为ajax请求）
+            planTable.reload({
+                where: params,
+                page: {
+                    curr: 1
+                    //重新从第 1 页开始
+                }
+            });
+            return false;
+        });//查询结束
+        form.on('select(Pselect)', function (data) {
+            opr.ajax({
+                url: '/dict/getDict/' + data.value,
+                method: 'post',
+                layer: layer,
+                layuiTableIns: planTable,
+                responseOkHandler: function (result) {
+                    if (result.length > 0) {
+                        $('#Name').empty();
+                        $('#Name').append("<option value=''>选择子分类</option>");
+                        for (var i = 0; i < result.length; i++) {
+                            var item = result[i];
+                            $("<option value=" + item.goodsId + ">" + item.goodsName + "</option>").appendTo("#Name");
+                        }
+                        form.render("select");
+                    }
+                }
+            });
+        });
+        form.on('select(Sselect)', function (data) {
+            opr.ajax({
+                url: '/goods/selectById/' + data.value,
+                method: 'post',
+                layer: layer,
+                responseOkHandler: function (data) {
+
+                    $("#number2").val(data.data.goodsNumber);
+                    /*$("#number").attr("placeholder","剩余存储量："+data.data.goodsNumber);*/
+                    $("#number").val(data.data.goodsNumber);
+
+
+                }
+            });
+
+        });
+
+    });
+
+</script>
+</body>
+</html>

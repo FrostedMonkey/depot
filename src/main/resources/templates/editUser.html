@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>用户角色权限</title>
+    <script type="text/javascript" src="https://cdn.goeasy.io/goeasy.js"></script>
+</head>
+<body>
+<div style="padding: 15px;">
+
+    <form class="layui-form" id="form-user-quanx" lay-filter="form-user-quanx">
+        <div class="layui-form-item"></div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">全部角色</label>
+            <div class="layui-input-block layui-col-md4">
+                <input th:each="u:${roles}" type="checkbox" name="rrr" th:title="${u.value.roleName }"
+                       th:value="${u.value.roleId }" th:checked="${u.value.checked }" lay-skin="primary">
+            </div>
+
+        </div>
+
+        <div class="layui-form-item">
+            <button class="layui-btn" id="bn-user-set-quanx">提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+
+        <input type="hidden" th:value="${#httpServletRequest.getAttribute('nowUserId')}" id="nowUserId">
+        <!--<input type="hidden" th:value="${#session.nowUserId}" id="nowUserId">-->
+    </form>
+</div>
+<script type="text/javascript" src="/js/roleJs.js"></script>
+<script type="text/javascript" src="/js/MyMessage.js"></script>
+<script type="text/javascript">
+
+    $('#bn-user-set-quanx').click(function () {
+        var rIds = [];
+        $('#form-user-quanx :checkbox:checked').each(function () {
+            rIds.push(this.value);
+        });
+        var rIds = [];
+        $('#form-user-quanx :checkbox:checked').each(function () {
+            rIds.push(this.value);
+        });
+
+        var userId = $('#nowUserId').val();
+        opr.ajaxWithConfirm({
+            title: "您确实吗？",
+            url: '/user/quanx/' + userId,//此处\${ro_id}	是el表达式，不是js代码，运行于服务器端。
+            method: 'post',
+            data: JSON.stringify(rIds),
+            contentType: 'application/json;charset=UTF-8',
+            layer: layer,
+            responseOkHandler: function (result) {
+                layer.close(quanxianId);
+                return true;//返回true,继续默认后续行为
+            }
+        });
+
+        return false;
+    });
+
+</script>
+</body>
+</html>

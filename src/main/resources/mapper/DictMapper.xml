@@ -1,0 +1,11 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.twoc.depots.mapper.DictMapper">
+    <select id="selectPdict" resultType="com.twoc.depots.entity.Dict">
+        select DISTINCT goods_pid,goods_pname from depot_dict
+    </select>
+    <select id="selectDict" resultType="com.twoc.depots.entity.Dict">
+        select DISTINCT goods_id,goods_name from depot_dict where goods_pid=#{goodsPid}
+    </select>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.twoc.depots.mapper.URMapper">
+    <insert id="insertList">
+        insert into
+        sys_ur(user_id,role_id)
+        values
+        <foreach collection="roleIds" item="roleId" index="i" open="" close="" separator=",">
+            (#{userId},#{roleId})
+        </foreach>
+    </insert>
+
+    <delete id="roledeleteAllUr">
+        delete from sys_ur where user_id = #{userId}
+    </delete>
+</mapper>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <script type="text/javascript" src="https://cdn.goeasy.io/goeasy.js"></script>
+</head>
+<body>
+<div style="padding: 0px 0 15px 0px;">
+		<span class="layui-breadcrumb" lay-separator="-"> <a href="#">历史数据</a>
+			<a><cite>出入库历史详情</cite></a>
+		</span>
+</div>
+
+<form class="layui-form" id="form-plan-query">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">申请人</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="text" name="applyPerson" autocomplete="off"
+                       class="layui-input">
+            </div>
+            <label class="layui-form-label">商品名称</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="text" name="goodsName" autocomplete="off"
+                       class="layui-input">
+            </div>
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <select name="tradeType" lay-verify="select-plan-query-plan-type">
+                    <option value="">请选择类型</option>
+                    <option value="0">入库</option>
+                    <option value="1">出库</option>
+                </select>
+            </div>
+
+            <button class="layui-btn" id="bn-plan-query"><i class="layui-icon layui-icon-search"></i> 查询</button>
+        </div>
+    </div>
+</form>
+<table id="info-log" lay-filter="infoLog"></table>
+<script src="/layui/layui.js"></script>
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="/js/sweetalert-2.1.0.min.js"></script>
+<script src="/js/common.js"></script>
+<script src="/js/MyMessage.js"></script>
+<script th:inline="javascript">
+    layui.use(['element', 'table', 'layer', 'form'], function () {
+        var table = layui.table;
+        var layer = layui.layer;
+        var form = layui.form;
+        var infoLog = table.render({
+            elem: '#info-log',
+            url: '/trade/log', //数据接口
+            page: true,//显示分页条
+            limits: [5, 10, 15, 20, 30],
+            limit: 5,
+            cols:
+                [[ //表头
+                    {
+                        field: 'tradeId',
+                        title: '编号',
+                        width: 60,
+                        align: 'center'
+                    }, {
+                        field: 'goodsName',
+                        title: '商品名称',
+                        width: 92,
+                        align: 'center'
+                    }, {
+                        field: 'applyPerson',
+                        title: '申请人',
+                        width: 74,
+                        align: 'center'
+                    },
+                    {
+                        field: 'applyTime',
+                        title: '申请时间',
+                        width: 196
+                    },
+                    {
+                        field: 'comeOutPerson',
+                        title: '出入库确认人',
+                        width: 145,
+                        align: 'center'
+                    },
+                    {
+                        field: 'comeOutTime',
+                        title: '出入库时间',
+                        width: 232,
+                        align: 'center'
+                    }, {
+                        field: 'number',
+                        title: '数量',
+                        align: 'center',
+                    },
+                    {
+                        field: 'tradeType',
+                        title: '类型',
+                        align: 'center',
+                        width: 84,
+                        templet: function (d) {
+                            if (d.tradeType == 0) {
+                                return "入库";
+                            }
+                            if (d.tradeType == 1) {
+                                return "出库";
+                            }
+                        }
+                    }, {
+                        field: 'tradeStatus',
+                        title: '状态',
+                        width: 131,
+                        align: 'center',
+                        templet: function (f) {
+                            if (f.tradeStatus == 2) {
+                                return "审批未通过";
+                            }
+                            if (f.tradeStatus == 15) {
+                                return "已入库";
+                            }
+                            if (f.tradeStatus == 30) {
+                                return "已出库";
+                            }
+                        }
+                    }
+
+                ]]
+        });
+        $('#bn-plan-query').click(function () {
+            //将表单参数封装为json对象
+            var arr = $("#form-plan-query").serializeArray();
+            var params = {};
+
+            for (var i = 0; i < arr.length; i++) {
+                params[arr[i].name] = arr[i].value;
+            }
+
+            //传递查询参数重载表格（内部为ajax请求）
+            infoLog.reload({
+                where: params,
+                page: {
+                    curr: 1
+                    //重新从第 1 页开始
+                }
+            });
+            return false;
+        });//查询结束
+        form.on('select(select-plan-query-plan-type)', function (data) {
+            $('#bn-plan-query').click();
+
+        });
+    });
+</script>
+</body>
+</html>

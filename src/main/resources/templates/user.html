@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <script type="text/javascript" src="https://cdn.goeasy.io/goeasy.js"></script>
+</head>
+<body>
+<div style="padding: 0px 0 15px 0px;">
+		<span class="layui-breadcrumb" lay-separator="-"> <a href="#">安全信息管理</a>
+			<a><cite>用户信息维护</cite></a>
+		</span>
+    <input type="hidden" th:value="${#session.getAttribute('userLogin')}" id="userLogin">
+</div>
+<!-- 新增窗口内容 -->
+<div style="padding: 15px; display: none;" id="dom-win-user-add">
+    <form class="layui-form" lay-filter="form-user-add">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="userName" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">员工姓名</label>
+            <div class="layui-input-block">
+                <input type="text" name="employeeName" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">性别</label>
+            <div class="layui-input-block">
+                <select name="sex" lay-verify="">
+                    <option value="">请选择性别</option>
+                    <option value="0">男</option>
+                    <option value="1">女</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">联系地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="employeeAddress" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">身份证</label>
+            <div class="layui-input-block">
+                <input type="text" name="idCard" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">生日</label>
+            <div class="layui-input-block">
+                <input type="date" name="birthday" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">联系电话</label>
+            <div class="layui-input-block">
+                <input type="text" name="phone" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="bn-user-do-add">提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<!--修改页面-->
+<div style="padding: 15px; display: none;" id="dom-win-user-upd">
+
+    <form class="layui-form" lay-filter="form-user-upd">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户编号</label>
+            <div class="layui-input-block">
+                <input type="text" id="input-user-upd-user-id" name="userId" required lay-verify="required"
+                       readonly="readonly"
+                       autocomplete="off" class="layui-input"
+                       onclick="layer.tips('编号不可编辑。', this,{tips:[4,'#6f6f6f'],time: 1500});">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="userName" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">员工姓名</label>
+            <div class="layui-input-block">
+                <input type="text" name="employeeName" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">性别</label>
+            <div class="layui-input-block">
+                <select name="sex" lay-verify="">
+                    <option value="">请选择性别</option>
+                    <option value="0">男</option>
+                    <option value="1">女</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">联系地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="employeeAddress" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">身份证</label>
+            <div class="layui-input-block">
+                <input type="text" name="idCard" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">生日</label>
+            <div class="layui-input-block">
+                <input type="date" name="birthday" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">联系电话</label>
+            <div class="layui-input-block">
+                <input type="text" name="phone" required lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="bn-user-do-upd">提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<div style="padding: 15px; display: none;" id="dom-win-user-message">
+
+    <form class="layui-form" lay-filter="form-user-message">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户编号</label>
+            <div class="layui-input-block">
+                <input type="text" name="userId" required lay-verify="required" readonly="readonly"
+                       autocomplete="off" class="layui-input"
+                       disabled="true">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="userName" required lay-verify="required"
+                       autocomplete="off" class="layui-input" disabled="true">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">员工姓名</label>
+            <div class="layui-input-block">
+                <input type="text" name="employeeName" required lay-verify="required"
+                       autocomplete="off" class="layui-input" disabled="true">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">性别</label>
+            <div class="layui-input-block">
+                <select name="sex" lay-verify="" disabled="true">
+                    <option value="">请选择性别</option>
+                    <option value="0">男</option>
+                    <option value="1">女</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">联系地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="employeeAddress" required lay-verify="required"
+                       autocomplete="off" class="layui-input" disabled="true">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">身份证</label>
+            <div class="layui-input-block">
+                <input type="text" name="idCard" required lay-verify="required"
+                       autocomplete="off" class="layui-input" disabled="true">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">联系电话</label>
+            <div class="layui-input-block">
+                <input type="text" name="phone" required lay-verify="required"
+                       autocomplete="off" class="layui-input" disabled="true">
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+<!-- 查询表单 -->
+<form class="layui-form" id="form-user-query">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <select name="userStatus" lay-verify="required" lay-filter="select-user-query-user-status">
+                    <option value="">全部</option>
+                    <option value="0">未确定</option>
+                    <option value="1">已确定</option>
+                    <option value="2">启用</option>
+                    <option value="3">禁用</option>
+                </select>
+            </div>
+
+
+            <label class="layui-form-label">编号</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="number" name="userId" autocomplete="off"
+                       class="layui-input">
+            </div>
+
+            <label class="layui-form-label">姓名</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="text" name="employeeName" autocomplete="off"
+                       class="layui-input">
+            </div>
+
+            <button class="layui-btn" id="bn-user-query"><i class="layui-icon layui-icon-search"></i> 查询</button>
+
+        </div>
+    </div>
+</form>
+<div class="layui-btn-container">
+    <button type="button" class="layui-btn" id="bn-user-add"><i class="layui-icon">&#xe608;</i> 新增</button>
+    <button type="button" class="layui-btn" id="bn-user-enter"><i class="layui-icon">&#xe608;</i> 确定</button>
+    <button type="button" class="layui-btn" id="bn-user-open"><i class="layui-icon">&#xe608;</i> 启用</button>
+    <button type="button" class="layui-btn" id="bn-user-close"><i class="layui-icon">&#xe608;</i> 禁用</button>
+</div>
+<!--操作栏-->
+<script type="text/html" id="barDemo">
+    <!--  laytpl 语法， d指数据，在这里指当前行数据 -->
+    {{#  if(d.userStatus == 0 ){ }}<!--未确定-->
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="user_enter"><i
+            class="layui-icon layui-icon-ok-circle"></i>
+        确定</a>
+    <a class="layui-btn layui-btn-xs" lay-event="user_edit"><i class="layui-icon">&#xe608;</i> 编辑</a>
+    <a class="layui-btn layui-btn-xs" lay-event="user_message"><i class="layui-icon layui-icon-tree"></i> 详情</a>
+    {{#  }else if(d.userStatus == 1 || d.userStatus == 2 ){  }}<!--确定未启用-->
+    <a class="layui-btn layui-btn-xs" lay-event="user_use"><i class="layui-icon layui-icon-auz"></i> 启用</a>
+    <a class="layui-btn layui-btn-xs" lay-event="user_message"><i class="layui-icon layui-icon-tree"></i> 详情</a>
+    {{#  }else if(d.userStatus == 3){  }}<!--以请用-->
+    <a class="layui-btn layui-btn-xs" lay-event="user_unse"><i class="layui-icon layui-icon-fonts-del"></i> 禁用</a>
+    <a class="layui-btn layui-btn-xs" lay-event="user_message"><i class="layui-icon layui-icon-tree"></i> 详情</a>
+    <a class="layui-btn layui-btn-xs" lay-event="user_quanx"><i class="layui-icon layui-icon-set"></i> 权限</a>
+    {{#  }  }}
+</script>
+<table id="info-user-table" lay-filter="userTable"></table>
+<script src="/layui/layui.js"></script>
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="/js/sweetalert-2.1.0.min.js"></script>
+<script src="/js/common.js"></script>
+<script type="text/javascript" src="/js/roleJs.js"></script>
+<script type="text/javascript" src="/js/MyMessage.js"></script>
+<!--<script th:inline="none">-->
+<script th:inline="javascript">
+    layui.use(['element', 'table', 'layer', 'form'], function () {
+        var table = layui.table;
+        var layer = layui.layer;
+        var form = layui.form;
+
+
+        var userTable = table.render({
+            elem: '#info-user-table',
+            url: '/user/list', //数据接口
+            page: true,//显示分页条
+            limits: [5, 10, 15, 20, 30],
+            limit: 5,
+            cols:
+                [[ //表头
+                    {
+                        type: 'checkbox'
+                    }, {
+                        field: 'userId',
+                        title: '用户编号'
+                    }, {
+                        field: 'employeeName',
+                        title: '员工姓名'
+                    }, {
+                        field: 'phone',
+                        title: '联系电话'
+                    }, {
+                        field: 'userStatus',
+                        title: '状态',
+                        align: 'center',
+                        templet: function (d) {
+                            if (d.userStatus == 0) {
+                                return "未确定";
+                            }
+                            if (d.userStatus == 1 || d.userStatus == 2) {
+                                return "未启用";
+                            }
+                            if (d.userStatus == 3) {
+                                return "以启用";
+                            }
+                        }
+                    }, {
+                        align: 'center',
+                        title: '操作',
+                        toolbar: '#barDemo'
+                    }
+
+                ]]
+        });
+        table.on('tool(userTable)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            var tr = obj.tr; //获得当前行 tr 的DOM对象
+            if (layEvent === 'user_edit') { //编辑
+                opr.ajax({
+                    url: '/user/selectById/' + data.userId,
+                    method: 'post',
+                    layer: layer,
+                    responseOkHandler: function (user) {
+
+                        //form-cus-upd是表单的lay-filter值
+                        form.val("form-user-upd", user);
+
+                        layerIdx = layer.open({
+                            type: 1,
+                            title: '修改用户信息',
+                            area: ['700px', '400px'],
+                            content: $('#dom-win-user-upd'),
+                            zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+                        });
+
+                    }
+                });
+
+            } else if (layEvent === 'user_use') { //启用
+                opr.ajaxWithConfirm({
+                    title: "您确实要启用该用户信息吗?",
+                    url: '/user/update/' + data.userId + '/3',
+                    method: 'post',
+                    layer: layer,
+                    layuiTableIns: userTable
+                });
+
+            } else if (layEvent === 'user_unse') { //禁用
+
+                opr.ajaxWithConfirm({
+                    title: "您确实要禁用该用户信息吗?",
+                    url: '/user/update/' + data.userId + '/2',
+                    method: 'post',
+                    layer: layer,
+                    layuiTableIns: userTable
+                });
+
+
+            } else if (layEvent === 'user_enter') {
+                opr.ajaxWithConfirm({
+                    title: "您确定该用户信息吗?",
+                    url: '/user/update/' + data.userId + '/1',
+                    method: 'post',
+                    layer: layer,
+                    layuiTableIns: userTable
+                });
+
+
+            } else if (layEvent === 'user_quanx') {
+                $.ajax({
+                    url: '/user/doUser/' + data.userId,
+                    method: 'get',
+                    dataType: 'html'
+                }).done(function (html) {
+                    quanxianId = layer.open({
+                        type: 1,
+                        area: ['700px', '400px'],
+                        content: html,
+                        zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+                    });
+
+                    form.render(null, 'form-user-quanx');//手动渲染表单
+
+                });
+            } else if (layEvent === 'user_message') {
+                opr.ajax({
+                    url: '/user/selectById/' + data.userId,
+                    method: 'post',
+                    layer: layer,
+                    responseOkHandler: function (user) {
+
+                        //form-cus-upd是表单的lay-filter值
+                        form.val("form-user-message", user);
+
+                        layerIdx = layer.open({
+                            type: 1,
+                            title: '用户详情',
+                            area: ['700px', '400px'],
+                            content: $('#dom-win-user-message'),
+                            zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+                        });
+
+                    }
+                });
+
+
+            }
+
+        });//监听工具条结束
+
+        var layerIdx;
+        $('#bn-user-add').click(function () {
+            form.val("form-user-add", {//form-cus-add是表单的lay-filter值
+                "userName": "",
+                "employeeName": "",
+                "sex": "",
+                "phone": "",
+                "idCard": "",
+                "employeeAddress": "",
+                "birthday": "",
+                "userPwd": ""
+            });
+            layerIdx = layer.open({
+                type: 1,
+                title: '新增用户信息',
+                area: ['700px', '400px'],
+                content: $('#dom-win-user-add'),
+                zIndex: 100 //将层次降低，以使sweetalert能够在layer之上
+            });
+        });//打开新增窗口结束
+        form.on('submit(bn-user-do-add)', function (data) {
+            opr.ajax({
+                url: '/user/add',
+                data: JSON.stringify(data.field),
+                method: 'post',
+                layer: layer,
+                layuiTableIns: userTable,
+                responseOkHandler: function (result) {
+                    layer.close(layerIdx);
+                    return true;//返回true,继续默认后续行为
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        form.on('submit(bn-user-do-upd)', function (data) {
+            opr.ajax({
+                url: '/user/updates',
+                data: JSON.stringify(data.field),
+                method: 'post',
+                contentType: 'application/json;charset=UTF-8',
+                layer: layer,
+                layuiTableIns: userTable,
+                responseOkHandler: function (result) {
+                    layer.close(layerIdx);
+                    return true;//返回true,继续默认后续行为
+                }
+            });
+
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });//监听修改表单提交结束
+
+        //监听select选择
+        form.on('select(select-user-query-user-status)', function (data) {
+            $('#bn-user-query').click();
+
+        });//监听select选择结束
+//查询
+        $('#bn-user-query').click(function () {
+
+            //将表单参数封装为json对象
+            var arr = $("#form-user-query").serializeArray();
+            var params = {};
+
+            for (var i = 0; i < arr.length; i++) {
+                params[arr[i].name] = arr[i].value;
+            }
+
+            //传递查询参数重载表格（内部为ajax请求）
+            userTable.reload({
+                where: params,
+                page: {
+                    curr: 1
+                    //重新从第 1 页开始
+                }
+            });
+            return false;
+        });//查询结束
+        //函数：改变多个客户信息状态
+        var changeMultiCusStatus = function (title, text, uStatus) {
+            var checkStatus = table.checkStatus('info-user-table'); //基础参数id对应的值
+            if (checkStatus.data.length == 0) {
+                swal({
+                    text: '您没有选择任何数据！',
+                    icon: "error",
+                    buttons: false,
+                    timer: 1500
+                });
+                return;
+            }
+
+            var arr = [];
+            $.each(checkStatus.data, function () {
+                arr.push(this.userId);
+            });
+
+            opr.ajaxWithConfirm({
+                title: title,
+                text: text,
+                url: '/user/status/' + uStatus,
+                data: JSON.stringify(arr),
+                contentType: 'application/json;charset=UTF-8',
+                method: 'post',
+                layer: layer,
+                layuiTableIns: userTable
+            });
+
+
+        }//函数：改变多个客户信息状态结束
+
+        $('#bn-user-enter').click(function () {
+
+            changeMultiCusStatus('您确实要确认选择的用户吗？', '', '1');
+
+        });//启用多条数据
+        $('#bn-user-open').click(function () {
+
+            changeMultiCusStatus('您确实要启用选择的用户吗？', '', '3');
+
+        });//启用多条数据
+        $('#bn-user-close').click(function () {
+
+            changeMultiCusStatus('您确实要禁用选择的用户吗？', '', '2');
+
+        });
+
+    });
+</script>
+
+</body>

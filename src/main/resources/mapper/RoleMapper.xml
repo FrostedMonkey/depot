@@ -1,0 +1,78 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.twoc.depots.mapper.RoleMapper">
+    <select id="selectPageVo" resultType="com.twoc.depots.entity.Role">
+        select * from sys_role
+    </select>
+    <select id="selectByUser" resultType="com.twoc.depots.bean.dto.RoleDTO">
+        select r.* from
+        sys_ur ur LEFT JOIN sys_role r on ur.role_id=r.role_id
+        where ur.user_id=#{userId} and r.role_status=3
+    </select>
+    <select id="selectAllByUser" resultType="com.twoc.depots.bean.dto.RoleDTO">
+        SELECT distinct
+        e.role_id,
+        e.role_name,
+        u.user_id
+        FROM
+        sys_role e
+        left JOIN sys_ur r ON e.role_id=r.role_id
+        left JOIN (select user_id from sys_user where user_id=#{userId}) u ON u.user_id = r.user_id
+        where e.role_status=3
+
+    </select>
+    <select id="getRoleModules" resultType="com.twoc.depots.bean.dto.MenuDTO">
+        SELECT
+        p.module_id p_id,
+        p.module_name p_name,
+        c.module_id,
+        c.module_name,
+        rm.role_id
+        FROM
+        sys_module p
+        JOIN sys_module c ON p.module_id = c.module_pid
+        LEFT JOIN (
+        SELECT
+        role_id,
+        module_id
+        FROM
+        sys_rm
+        WHERE
+        role_id = #{roleId}
+        ) rm ON rm.module_id = c.module_id
+        WHERE
+        p.module_status = 1
+        AND p.module_ismenu = 1
+        AND p.module_pid IS NULL
+        AND c.module_status = 1
+        AND c.module_ismenu = 0
+        AND c.module_pid IS NOT NULL
+        ORDER BY
+        p.module_id,
+        c.module_id
+    </select>
+    <delete id="deleteModuleById">
+        delete from sys_rm where role_id=#{roleId}
+    </delete>
+    <insert id="insertRoleModules">
+        insert into
+
+        sys_rm(role_id,module_id)
+
+        values
+        <foreach collection="mIds" item="moduleId" index="i" open="" close="" separator=",">
+            (#{roleId},#{moduleId})
+        </foreach>
+    </insert>
+    <update id="updateStatus">
+        update
+        sys_role
+        set
+        role_status=#{rStatus}
+        where role_id in
+        <foreach open="(" collection="rIds" item="rId" close=")" separator=",">
+            #{rId}
+        </foreach>
+    </update>
+</mapper>
